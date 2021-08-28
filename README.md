@@ -1,8 +1,8 @@
 ## React-PokemonDigi
 
 ```
-API: Pokéapi
-Description: Pokémon Information
+API: Exchangerate.host
+Description: Free foreign exchange & crypto rates API
 Auth: No
 HTTPS: Yes
 CORS: Unknown
