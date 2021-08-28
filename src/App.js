@@ -10,7 +10,7 @@ function App() {
   const [menu, setMenu] = useState(false);
   return (
     <div className="main">
-      <img className="bg-img" src="/images/bg.jpg" alt="Bg-img" />
+      <img className="bg-img" src="images/bg.jpg" alt="Bg-img" />
       <header className="header">
         <Link to="/" onClick={() => setMenu(false)}>
           <div className="header-logo">
