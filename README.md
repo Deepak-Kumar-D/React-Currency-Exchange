@@ -1,4 +1,4 @@
-## React-PokemonDigi
+## React-Currency-Exchange
 
 ```
 API: Exchangerate.host
