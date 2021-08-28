@@ -3,27 +3,20 @@ import { useHistory } from "react-router-dom";
 
 function All() {
   const history = useHistory();
-  const [search, setSearch] = useState("");
   const [result, setResult] = useState([]);
 
   //   Fetching all current rates
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    const obj = await fetch(
-      `https://rest.coinapi.io/v1/exchangerate/${search.toUpperCase()}?invert=false`,
-      {
-        method: "GET",
-        headers: {
-          "X-CoinAPI-Key": "5E580C5C-09D8-4BCD-8EA1-FC9E5197AF9F",
-        },
-      }
-    );
+    const obj = await fetch(`https://api.exchangerate.host/latest`, {
+      method: "GET",
+    });
 
     const data = await obj.json();
 
     if (obj.status === 200) {
-      setResult(data);
+      setResult(data.rates);
     } else {
       alert("Server error. Try again later!");
       history.push("/");
@@ -33,11 +26,9 @@ function All() {
     <section className="body">
       <div className="body-1">
         <form method="GET" onSubmit={onSubmit}>
-          <input
-            type="text"
-            placeholder="BTC"
-            onChange={(event) => setSearch(event.target.value)}
-          />
+          <p className="check-rates">
+            Check the latest foreign exchange rates.
+          </p>
 
           <div>
             <input type="submit" value="CHECK" />
@@ -53,19 +44,14 @@ function All() {
               <p className="value-heading">Current Rate</p>
             </div>
 
-            {result.rates.map((ele, index) => {
+            {Object.keys(result).map((key, index) => {
               return (
                 <div key={index} className="value-table">
-                  <p>{ele.asset_id_quote}</p>
-                  <p>{ele.rate}</p>
+                  <p>{key}</p>
+                  <p>{result[key]}</p>
                 </div>
               );
             })}
-
-            <div className="value-table">
-              <p className="row-1">Deepak</p>
-              <p className="row-2">Kumar Dileep Kumar</p>
-            </div>
           </div>
         ) : (
           ""

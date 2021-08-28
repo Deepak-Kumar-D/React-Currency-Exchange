@@ -126,7 +126,25 @@
   width: 50%;
 }
 
+.body-1 .check-rates {
+  color: white;
+  padding-bottom: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
 .body-1 form input[type="text"] {
+  color: #494949;
+  font-weight: bold;
+  letter-spacing: 1px;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  outline: none;
+  border: none;
+}
+
+.body-1 form select {
+  cursor: pointer;
   color: #494949;
   font-weight: bold;
   letter-spacing: 1px;
@@ -152,6 +170,13 @@
   background-color: #363535;
   color: white;
   border: 1px solid white;
+}
+
+.cc-heading {
+  font-size: 0.9rem;
+  color: white;
+  font-weight: bold;
+  padding-bottom: 0.1rem;
 }
 
 /* Contents */

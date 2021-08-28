@@ -3,8 +3,11 @@ import { useHistory } from "react-router-dom";
 
 function CConverter() {
   const history = useHistory();
-  const [currency1, setCurrency1] = useState("");
-  const [currency2, setCurrency2] = useState("");
+  const [amount, setAmount] = useState(1);
+
+  const [currency1, setCurrency1] = useState("eur".toUpperCase());
+  const [currency2, setCurrency2] = useState("usd".toUpperCase());
+
   const [result1, setResult1] = useState([]);
   const [result2, setResult2] = useState([]);
   const [option, setOption] = useState([]);
@@ -13,84 +16,103 @@ function CConverter() {
     e.preventDefault();
     // Fetching rates for both the currencies searched
     const obj1 = await fetch(
-      `https://rest.coinapi.io/v1/exchangerate/${currency1.toUpperCase()}/${currency2.toUpperCase()}`,
-      {
-        method: "GET",
-        headers: {
-          "X-CoinAPI-Key": "5E580C5C-09D8-4BCD-8EA1-FC9E5197AF9F",
-        },
-      }
+      `https://api.exchangerate.host/convert?from=${currency1}&to=${currency2}`,
+      { method: "GET" }
     );
 
     const data1 = await obj1.json();
 
-    const obj2 = await fetch(
-      `https://rest.coinapi.io/v1/exchangerate/${currency2.toUpperCase()}/${currency1.toUpperCase()}`,
-      {
-        method: "GET",
-        headers: {
-          "X-CoinAPI-Key": "5E580C5C-09D8-4BCD-8EA1-FC9E5197AF9F",
-        },
-      }
-    );
+    const obj2 = await fetch(`https://api.exchangerate.host/latest`, {
+      method: "GET",
+    });
 
     const data2 = await obj2.json();
-    console.log(data2);
 
-    setResult1(data1);
-    setResult2(data2);
+    setResult1(amount * data1.result);
+    setResult2(data2.rates[currency1]);
+  };
+
+  const handleAmount = (ele) => {
+    setAmount(ele);
+  };
+
+  const handleCurrency1 = (ele) => {
+    setCurrency1(ele);
+  };
+
+  const handleCurrency2 = (ele) => {
+    setCurrency2(ele);
+  };
+
+  const currencyLoad = async () => {
+    const obj = await fetch(`https://api.exchangerate.host/symbols`, {
+      method: "GET",
+    });
+
+    const data = await obj.json();
+
+    if (obj.status === 200) {
+      setOption(data);
+    } else {
+      alert("API call error. Check back later!");
+      history.push("/");
+    }
   };
 
   useEffect(() => {
-    const currencyLoad = async () => {
-      const obj = await fetch(`https://rest.coinapi.io/v1/assets`, {
-        method: "GET",
-        headers: {
-          "X-CoinAPI-Key": "5E580C5C-09D8-4BCD-8EA1-FC9E5197AF9F",
-        },
-      });
-
-      const data = await obj.json();
-
-      if (obj.status === 200) {
-        data.forEach((element) => {
-          if (!element.type_is_crypto) {
-            let temp = [...option];
-            temp.push(element.asset_id);
-            setOption(temp);
-            // console.log(element.asset_id);
-          }
-        });
-      } else {
-        alert("API call error. Check back later!");
-        history.push("/");
-      }
-    };
-
     currencyLoad();
-  }, [history, option]);
+
+    return () => {
+      setOption({});
+    };
+  }, []);
   return (
     <section className="body">
       <div className="body-1">
-        <select>
-          <option>Select Currency</option>
-          {option.map((ele) => {
-            return <option>{ele}</option>;
-          })}
-        </select>
-
         <form method="GET" onSubmit={onSubmit}>
+          <p className="cc-heading">Amount</p>
           <input
             type="text"
-            placeholder="Ex: INR"
-            onChange={(event) => setCurrency1(event.target.value)}
+            placeholder="1"
+            onChange={(event) => handleAmount(event.target.value)}
+            valu={amount}
           />
 
-          <input
-            type="text"
-            placeholder="Ex: USD"
-            onChange={(event) => setCurrency2(event.target.value)}
-          />
+          <p className="cc-heading">From</p>
+          <select
+            onChange={(event) => handleCurrency1(event.target.value)}
+            value={currency1.toUpperCase()}
+          >
+            {option.length !== 0 ? (
+              <>
+                {Object.keys(option.symbols).map((key, index) => {
+                  return <option key={index}>{key}</option>;
+                })}
+              </>
+            ) : (
+              ""
+            )}
+          </select>
+
+          <p className="cc-heading">To</p>
+          <select
+            onChange={(event) => handleCurrency2(event.target.value)}
+            value={currency2.toUpperCase()}
+          >
+            {option.length !== 0 ? (
+              <>
+                {Object.keys(option.symbols).map((key, index) => {
+                  return (
+                    <option key={index} value={key}>
+                      {key}
+                    </option>
+                  );
+                })}
+              </>
+            ) : (
+              ""
+            )}
+          </select>
 
           <div>
             <input type="submit" value="CONVERT" />
@@ -98,20 +120,21 @@ function CConverter() {
         </form>
       </div>
 
-      <div className="body-2">
-        {result1.length !== 0 ? (
+      {result1.length !== 0 ? (
+        <div className="body-2">
           <div className="body-2-sub">
             <h4>
-              1 {result2.asset_id_quote}: {result2.rate}
+              1 {currency1}: {result2}
             </h4>
+
             <h4>
-              1 {result2.asset_id_base}: {result1.rate}
+              1 {currency2}: {result1}
             </h4>
           </div>
-        ) : (
-          ""
-        )}
-      </div>
+        </div>
+      ) : (
+        ""
+      )}
     </section>
   );
 }
